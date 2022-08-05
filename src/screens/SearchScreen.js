@@ -1,54 +1,44 @@
- import React, { useState, useEffect} from "react";
- import {View, Text, StyleSheet} from 'react-native';
+ import React, { useState} from "react";
+ import {View, Text, StyleSheet, ScrollView} from 'react-native';
  import SearchBar from "../components/SearchBar";
- import yelp from "../api/yelp";
+ import ResultsList from '../components/ResultList'
+ import useResults from '../hooks/useResults';
   
  const SearchScreen = () => {
     const [term, setTerm] = useState('');
-    const [results, setResults] = useState([]);
-    const [errorMessage, setErrorMessage] = useState('')
-
-    const searchApi = async (searchTerm) => {
-        try {
-            const response = await yelp.get('/search', {
-                params:{
-                    limit: 50,
-                    term: searchTerm, 
-                    location:'Boston'
-                }
-            })
-            console.log("response from yelp",response.data)
-            setResults(response.data.businesses)
-        } catch (error) {
-            setErrorMessage('Something went wrong')
-        }
+    const [ results, searchAPI, errorMessage] = useResults();
+    
+    const filterResultsByPrice = (price) => {
+        return results.filter((result) => {
+            if(result.price === price) {
+                return result
+            } 
+        })
     }
 
-    useEffect(() => {
-        searchApi('Pasta');
-    }, [])
-    
-
     return (
-        <View style={styles.container}>
-            <SearchBar term={term} 
-            onTermChange={newTerm => setTerm(newTerm)}
-            onTermSubmit={() => searchApi(term)}
-            />
-            <View style={styles.resultContainer}>
-                <Text>We have found {results.length} results</Text>
-                {errorMessage? <Text>{errorMessage}</Text> : <Text></Text>}
+        <>
+            <View>
+                <SearchBar term={term} 
+                onTermChange={newTerm => setTerm(newTerm)}
+                onTermSubmit={() => searchAPI(term)}
+                />
+            
+                <Text style={styles.resultDetails}>We have found {results.length} results</Text>
+                {errorMessage? <Text style={styles.resultDetails}>{errorMessage}</Text> : <Text></Text>}
             </View>
-        </View>
+            <ScrollView>
+                <ResultsList results={filterResultsByPrice('$')} title='Cheap'/>
+                <ResultsList results={filterResultsByPrice('$$')} title='Pricey'/>
+                <ResultsList results={filterResultsByPrice('$$$')} title='Thieves'/>
+            </ScrollView>
+        </>
     );
  };
 
  const styles = StyleSheet.create({
-    resultContainer: {
-        top: 30,
-    }, 
-    container: {
-        marginHorizontal: 15
+    resultDetails: {
+        top:20
     }
  });
 
