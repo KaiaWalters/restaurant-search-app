@@ -1,6 +1,7 @@
 import React from 'react'
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import ResultCard from './ResultCard'
+import { withNavigation } from 'react-navigation';
 
 const ResultList = ({title, results, navigation}) => {
     return <View style={styles.container}>
@@ -10,11 +11,11 @@ const ResultList = ({title, results, navigation}) => {
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.list}
-            data={results}
+            data={results} 
             keyExtractor={(result) => {result.id}}
             renderItem={({item}) => {
                 return( 
-                <TouchableOpacity onPress={() => navigation.navigate('ResultsShow')}>
+                <TouchableOpacity onPress={() => navigation.navigate('ResultsShow', {id: item.id})}>
                     <ResultCard result={item}/>
                 </TouchableOpacity>
                 )
@@ -34,4 +35,4 @@ const styles = StyleSheet.create({
     }
 }); 
 
-export default ResultList
+export default withNavigation(ResultList);
