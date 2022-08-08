@@ -4,7 +4,10 @@ import ResultCard from './ResultCard'
 import { withNavigation } from 'react-navigation';
 
 const ResultList = ({title, results, navigation}) => {
-    return <View style={styles.container}>
+    if(!results.length) {
+        return null
+    }
+    return (<View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
         <Text>Results: {results.length}</Text>
         <FlatList
@@ -21,7 +24,7 @@ const ResultList = ({title, results, navigation}) => {
                 )
             }}
         />
-    </View>
+    </View>)
 }
 
 const styles = StyleSheet.create({
